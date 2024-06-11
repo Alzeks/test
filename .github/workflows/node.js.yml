@@ -1,24 +1,27 @@
-name: Node.js CI
-
+name: Build and Deploy
 on:
   push:
-    branches: [ "main" ]
-
+    branches:
+      - main
 jobs:
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
-
+    concurrency: ci-${{ github.ref }}
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: depends 
-      run: npm ci
-      
-    #- name: build  
-     # run: npm run build 
-      
-    - name: Deploy 🚀
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        folder: dist
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '16.13.2'
+
+      - name: Install and Build 🔧
+        run: |
+          npm ci
+          npm run build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages # The branch the action should deploy to.
+          folder: dist
